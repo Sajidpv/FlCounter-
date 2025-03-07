@@ -7,12 +7,21 @@ class LoadCountersEvent extends CounterEvent {}
 
 class AddCounterEvent extends CounterEvent {
   final String name;
+
   AddCounterEvent(this.name);
 }
 
 class IncrementCounterEvent extends CounterEvent {
   final String id;
-  IncrementCounterEvent(this.id);
+  final int count;
+
+  IncrementCounterEvent(this.id, {this.count = 1});
+}
+
+class DecrementCounterEvent extends CounterEvent {
+  final String id;
+  final int count;
+  DecrementCounterEvent(this.id, this.count);
 }
 
 class CounterSelectedEvent extends CounterEvent {

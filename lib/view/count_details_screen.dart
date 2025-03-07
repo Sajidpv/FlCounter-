@@ -21,12 +21,14 @@ class CounterDetailScreen extends StatelessWidget {
         title: Text(counter.name),
         actions: [
           IconButton(
-              onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SettingsScreen(),
-                  )),
-              icon: Icon(Icons.settings))
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SettingsScreen(),
+              ),
+            ),
+            icon: const Icon(Icons.settings),
+          )
         ],
       ),
       body: BlocBuilder<CounterBloc, CounterState>(
@@ -42,7 +44,47 @@ class CounterDetailScreen extends StatelessWidget {
                 : null,
             child: Stack(
               children: [
-                if (!settings.isFullScreenTap)
+                if (settings.isFullScreenTap)
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          counter.count.toString(),
+                          style: Theme.of(context)
+                              .textTheme
+                              .displayLarge
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            FloatingActionButton(
+                              heroTag: "decrement",
+                              onPressed: () {
+                                context
+                                    .read<CounterBloc>()
+                                    .add(DecrementCounterEvent(counter.id, 10));
+                              },
+                              child: const Icon(Icons.remove),
+                            ),
+                            const SizedBox(width: 20),
+                            FloatingActionButton(
+                              heroTag: "increment",
+                              onPressed: () {
+                                context
+                                    .read<CounterBloc>()
+                                    .add(IncrementCounterEvent(counter.id));
+                              },
+                              child: const Icon(Icons.add),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
+                else
                   Positioned(
                     left: settings.tapAreaX,
                     top: settings.tapAreaY,
@@ -55,16 +97,53 @@ class CounterDetailScreen extends StatelessWidget {
                             .add(IncrementCounterEvent(counter.id));
                       },
                       child: Container(
-                        color: Colors.blue.withOpacity(0.3),
+                        decoration: BoxDecoration(
+                          color: Colors.blueAccent.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Colors.blueAccent,
+                            width: 2,
+                          ),
+                        ),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                counter.count.toString(),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.remove),
+                                    onPressed: () {
+                                      context.read<CounterBloc>().add(
+                                          DecrementCounterEvent(
+                                              counter.id, 10));
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.add),
+                                    onPressed: () {
+                                      context.read<CounterBloc>().add(
+                                          IncrementCounterEvent(counter.id));
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                Center(
-                  child: Text(
-                    'Counter Value: ${counter.count}',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                ),
               ],
             ),
           );
