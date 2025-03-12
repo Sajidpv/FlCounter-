@@ -8,6 +8,8 @@
 import 'package:counter/app.dart';
 import 'package:counter/model/counter_model.dart';
 import 'package:counter/model/user_settings_model.dart';
+import 'package:counter/repository/counter_repository.dart';
+import 'package:counter/repository/settings_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -21,8 +23,9 @@ void main() {
     // Open the box for counters
     final counterBox = await Hive.openBox<CounterModel>('counters');
     final userSettingsBox = await Hive.openBox<UserSettings>('userSettingsBox');
-
-    await tester.pumpWidget(MyApp(counterBox, userSettingsBox));
+    final counterRepository = CounterRepository(counterBox);
+    final settingsRepository = SettingsRepository(userSettingsBox);
+    await tester.pumpWidget(MyApp(counterRepository, settingsRepository));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

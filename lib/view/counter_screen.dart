@@ -1,4 +1,6 @@
-import 'package:counter/view/count_details_screen.dart';
+import 'package:counter/routes/route_names.dart';
+import 'package:counter/view/widgets/action_dialog.dart';
+import 'package:counter/view/widgets/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../view-model/bloc/counter_bloc.dart';
@@ -10,16 +12,13 @@ class CounterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Multi Counter')),
+      drawer: SideDrawer(),
       body: BlocConsumer<CounterBloc, CounterState>(
         listener: (context, state) {
           if (state is CounterOpenedState) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    CounterDetailScreen(counter: state.counters),
-              ),
-            ).then((_) {
+            Navigator.pushNamed(context, RoutesName.open_counter,
+                    arguments: state.counters.id)
+                .then((_) {
               context.read<CounterBloc>().add(LoadCountersEvent());
             });
           }
@@ -40,11 +39,16 @@ class CounterScreen extends StatelessWidget {
                       title: Text(counter.name),
                       subtitle: Text('Count: ${counter.count}'),
                       trailing: IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => context
-                            .read<CounterBloc>()
-                            .add(DeleteCounterEvent(counter.id)),
-                      ),
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => showConfirmationDialog(
+                                context: context,
+                                title: "Delete Counter",
+                                message:
+                                    "Are you sure you want to delete counter ${counter.name}?",
+                                onConfirm: () => context
+                                    .read<CounterBloc>()
+                                    .add(DeleteCounterEvent(counter.id)),
+                              )),
                     ),
                   ),
                 );

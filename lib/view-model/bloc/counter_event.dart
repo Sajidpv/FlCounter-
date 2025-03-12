@@ -29,6 +29,13 @@ class CounterSelectedEvent extends CounterEvent {
   CounterSelectedEvent(this.id);
 }
 
+class JumpToCounterEvent extends CounterEvent {
+  final String counterId;
+  final int targetCount;
+
+  JumpToCounterEvent(this.counterId, this.targetCount);
+}
+
 class UpdateTapSettingsEvent extends CounterEvent {
   final bool isFullScreenTap;
   final double tapAreaX;

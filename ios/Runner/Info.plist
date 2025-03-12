@@ -45,5 +45,17 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+   	 <dict>
+        <key>UIApplicationShortcutItemType</key>
+        <string>new_counter</string>
+        <key>UIApplicationShortcutItemTitle</key>
+        <string>Create Counter</string>
+        <key>UIApplicationShortcutItemIconFile</key>
+        <string>add</string>
+   	 </dict>
+	</array>
+
 </dict>
 </plist>

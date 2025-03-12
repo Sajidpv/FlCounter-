@@ -1,92 +1,125 @@
 import 'package:counter/model/user_settings_model.dart';
+import 'package:counter/view-model/bloc/counter_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-class SettingsScreen extends StatefulWidget {
-  @override
-  _SettingsScreenState createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
-  late UserSettings settings;
-  bool isResizing = false;
-
-  @override
-  void initState() {
-    super.initState();
-    final userSettingsBox = Hive.box<UserSettings>('userSettingsBox');
-    settings = userSettingsBox.get('globalSettings') ?? UserSettings();
-  }
-
+class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Tap Settings")),
-      body: Column(
-        children: [
-          SwitchListTile(
-            title: const Text("Enable Full-Screen Tap"),
-            value: settings.isFullScreenTap,
-            onChanged: (value) {
-              setState(() {
-                settings.isFullScreenTap = value;
-                settings.save();
-              });
+      body: FutureBuilder<Box<UserSettings>>(
+        future: Hive.openBox<UserSettings>('userSettingsBox'),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          final userSettingsBox = snapshot.data!;
+          UserSettings settings =
+              userSettingsBox.get('globalSettings') ?? UserSettings();
+
+          return BlocListener<CounterBloc, CounterState>(
+            listenWhen: (previous, current) =>
+                current is CounterSettingsUpdatedState,
+            listener: (context, state) {
+              if (state is CounterSettingsUpdatedState) {
+                settings = state.settings;
+              }
             },
-          ),
-          if (!settings.isFullScreenTap)
-            Expanded(
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: settings.tapAreaX,
-                    top: settings.tapAreaY,
-                    width: settings.tapWidth,
-                    height: settings.tapHeight,
-                    child: GestureDetector(
-                      onPanUpdate: (details) {
-                        if (!isResizing) {
-                          setState(() {
-                            settings.tapAreaX += details.delta.dx;
-                            settings.tapAreaY += details.delta.dy;
-                            settings.save();
-                          });
-                        }
+            child: BlocBuilder<CounterBloc, CounterState>(
+              builder: (context, state) {
+                if (state is CounterLoadingState) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                return Column(
+                  children: [
+                    SwitchListTile(
+                      title: const Text("Enable Full-Screen Tap"),
+                      value: settings.isFullScreenTap,
+                      onChanged: (value) {
+                        context.read<CounterBloc>().add(UpdateTapSettingsEvent(
+                              isFullScreenTap: value,
+                              tapAreaX: settings.tapAreaX,
+                              tapAreaY: settings.tapAreaY,
+                              tapWidth: settings.tapWidth,
+                              tapHeight: settings.tapHeight,
+                            ));
                       },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.5),
-                          border: Border.all(color: Colors.blue, width: 2),
-                        ),
+                    ),
+                    if (!settings.isFullScreenTap)
+                      Expanded(
                         child: Stack(
                           children: [
                             Positioned(
-                              right: 0,
-                              bottom: 0,
+                              left: settings.tapAreaX,
+                              top: settings.tapAreaY,
+                              width: settings.tapWidth,
+                              height: settings.tapHeight,
                               child: GestureDetector(
-                                onPanStart: (_) =>
-                                    setState(() => isResizing = true),
                                 onPanUpdate: (details) {
-                                  setState(() {
-                                    settings.tapWidth =
-                                        (settings.tapWidth + details.delta.dx)
-                                            .clamp(50, 300);
-                                    settings.tapHeight =
-                                        (settings.tapHeight + details.delta.dy)
-                                            .clamp(50, 300);
-                                    settings.save();
-                                  });
+                                  context.read<CounterBloc>().add(
+                                        UpdateTapSettingsEvent(
+                                          isFullScreenTap:
+                                              settings.isFullScreenTap,
+                                          tapAreaX: settings.tapAreaX +
+                                              details.delta.dx,
+                                          tapAreaY: settings.tapAreaY +
+                                              details.delta.dy,
+                                          tapWidth: settings.tapWidth,
+                                          tapHeight: settings.tapHeight,
+                                        ),
+                                      );
                                 },
-                                onPanEnd: (_) =>
-                                    setState(() => isResizing = false),
                                 child: Container(
-                                  width: 20,
-                                  height: 20,
                                   decoration: BoxDecoration(
-                                    color: Colors.blue,
-                                    shape: BoxShape.circle,
+                                    color: Colors.blue.withValues(alpha: .5),
                                     border: Border.all(
-                                        color: Colors.white, width: 2),
+                                        color: Colors.blue, width: 2),
+                                  ),
+                                  child: Stack(
+                                    children: [
+                                      Positioned(
+                                        right: 0,
+                                        bottom: 0,
+                                        child: GestureDetector(
+                                          onPanUpdate: (details) {
+                                            context.read<CounterBloc>().add(
+                                                  UpdateTapSettingsEvent(
+                                                    isFullScreenTap: settings
+                                                        .isFullScreenTap,
+                                                    tapAreaX: settings.tapAreaX,
+                                                    tapAreaY: settings.tapAreaY,
+                                                    tapWidth: (settings
+                                                                .tapWidth +
+                                                            details.delta.dx)
+                                                        .clamp(50, 300),
+                                                    tapHeight: (settings
+                                                                .tapHeight +
+                                                            details.delta.dy)
+                                                        .clamp(50, 300),
+                                                  ),
+                                                );
+                                          },
+                                          child: Container(
+                                            width: 20,
+                                            height: 20,
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  color: Colors.white,
+                                                  width: 2),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -94,12 +127,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ],
                         ),
                       ),
-                    ),
-                  ),
-                ],
-              ),
+                  ],
+                );
+              },
             ),
-        ],
+          );
+        },
       ),
     );
   }
