@@ -1,5 +1,6 @@
 import 'package:counter/app.dart';
 import 'package:counter/bloc_observers.dart';
+import 'package:counter/configs/box_names.dart';
 import 'package:counter/model/counter_model.dart';
 import 'package:counter/model/user_settings_model.dart';
 import 'package:counter/repository/counter_repository.dart';
@@ -16,23 +17,17 @@ void main() async {
   Hive.registerAdapter(CounterModelAdapter());
   Hive.registerAdapter(UserSettingsAdapter());
 
-  final counterBox = await Hive.openBox<CounterModel>('counters');
-  final userSettingsBox = await Hive.openBox<UserSettings>('userSettingsBox');
+  final counterBox = await Hive.openBox<CounterModel>(COUNTER_BOX);
+  final userSettingsBox = await Hive.openBox<UserSettingsModel>(USER_BOX);
 
   final counterRepository = CounterRepository(counterBox);
   final settingsRepository = SettingsRepository(userSettingsBox);
 
   // Set default tap settings if not already set
-  if (userSettingsBox.get('globalSettings') == null) {
+  if (userSettingsBox.get(USER_DETAILS) == null) {
     userSettingsBox.put(
-      'globalSettings',
-      UserSettings(
-        isFullScreenTap: true,
-        tapAreaX: 100,
-        tapAreaY: 100,
-        tapWidth: 200,
-        tapHeight: 200,
-      ),
+      USER_DETAILS,
+      UserSettingsModel(),
     );
   }
   runApp(MyApp(counterRepository, settingsRepository));

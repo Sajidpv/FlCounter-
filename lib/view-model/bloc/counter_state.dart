@@ -20,6 +20,6 @@ class CounterOpenedState extends CounterState {
 }
 
 class CounterSettingsUpdatedState extends CounterState {
-  final UserSettings settings;
+  final UserSettingsModel settings;
   CounterSettingsUpdatedState(this.settings);
 }

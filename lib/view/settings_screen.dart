@@ -1,3 +1,4 @@
+import 'package:counter/configs/box_names.dart';
 import 'package:counter/model/user_settings_model.dart';
 import 'package:counter/view-model/bloc/counter_bloc.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +10,8 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Tap Settings")),
-      body: FutureBuilder<Box<UserSettings>>(
-        future: Hive.openBox<UserSettings>('userSettingsBox'),
+      body: FutureBuilder<Box<UserSettingsModel>>(
+        future: Hive.openBox<UserSettingsModel>(USER_BOX),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -20,8 +21,8 @@ class SettingsScreen extends StatelessWidget {
           }
 
           final userSettingsBox = snapshot.data!;
-          UserSettings settings =
-              userSettingsBox.get('globalSettings') ?? UserSettings();
+          UserSettingsModel settings =
+              userSettingsBox.get(USER_DETAILS) ?? UserSettingsModel();
 
           return BlocListener<CounterBloc, CounterState>(
             listenWhen: (previous, current) =>

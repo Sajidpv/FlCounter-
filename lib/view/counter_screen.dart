@@ -1,6 +1,7 @@
 import 'package:counter/routes/route_names.dart';
 import 'package:counter/view/widgets/action_dialog.dart';
 import 'package:counter/view/widgets/drawer.dart';
+import 'package:counter/view/widgets/fab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../view-model/bloc/counter_bloc.dart';
@@ -34,12 +35,17 @@ class CounterScreen extends StatelessWidget {
                       .read<CounterBloc>()
                       .add(CounterSelectedEvent(counter.id)),
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    elevation: 2,
                     margin: const EdgeInsets.all(8),
                     child: ListTile(
                       title: Text(counter.name),
                       subtitle: Text('Count: ${counter.count}'),
                       trailing: IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
+                          icon: Icon(Icons.delete_sharp,
+                              color: Colors.red.shade300),
                           onPressed: () => showConfirmationDialog(
                                 context: context,
                                 title: "Delete Counter",
@@ -58,41 +64,7 @@ class CounterScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          final counterNameController = TextEditingController();
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: const Text('Add Counter'),
-                content: TextField(
-                  controller: counterNameController,
-                  decoration: const InputDecoration(hintText: 'Counter Name'),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancel'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      if (counterNameController.text.isNotEmpty) {
-                        context
-                            .read<CounterBloc>()
-                            .add(AddCounterEvent(counterNameController.text));
-                        Navigator.pop(context);
-                      }
-                    },
-                    child: const Text('Add'),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: FAB(),
     );
   }
 }

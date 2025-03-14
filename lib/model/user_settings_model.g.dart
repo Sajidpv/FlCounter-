@@ -6,17 +6,17 @@ part of 'user_settings_model.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class UserSettingsAdapter extends TypeAdapter<UserSettings> {
+class UserSettingsAdapter extends TypeAdapter<UserSettingsModel> {
   @override
   final int typeId = 1;
 
   @override
-  UserSettings read(BinaryReader reader) {
+  UserSettingsModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return UserSettings(
+    return UserSettingsModel(
       isFullScreenTap: fields[0] as bool,
       tapAreaX: fields[1] as double,
       tapAreaY: fields[2] as double,
@@ -26,7 +26,7 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
   }
 
   @override
-  void write(BinaryWriter writer, UserSettings obj) {
+  void write(BinaryWriter writer, UserSettingsModel obj) {
     writer
       ..writeByte(5)
       ..writeByte(0)

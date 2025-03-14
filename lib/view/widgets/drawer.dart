@@ -1,3 +1,4 @@
+import 'package:counter/routes/route_names.dart';
 import 'package:flutter/material.dart';
 
 class SideDrawer extends StatelessWidget {
@@ -12,21 +13,20 @@ class SideDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(color: Colors.blue),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  "Settings Menu",
+              decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+              child: ListTile(
+                leading: ClipRRect(
+                  child: Image.asset('assets/counter.png'),
+                ),
+                title: Text(
+                  "FlCounter",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
-                Text(
-                  "Customize your tap settings",
+                subtitle: Text(
+                  "Multy Counter App",
                   style: TextStyle(color: Colors.white70, fontSize: 14),
                 ),
-              ],
-            ),
-          ),
+              )),
           ListTile(
             leading: const Icon(Icons.home),
             title: const Text('Home'),
@@ -39,11 +39,7 @@ class SideDrawer extends StatelessWidget {
             title: const Text('Settings'),
             onTap: () {
               Navigator.pop(context);
-              // Navigator.push(
-              //     context,
-              //     MaterialPageRoute(
-              //       builder: (context) => SettingsScreen(),
-              //     ));
+              Navigator.pushNamed(context, RoutesName.settings);
             },
           ),
           ListTile(

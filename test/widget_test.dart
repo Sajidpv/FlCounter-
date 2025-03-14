@@ -6,6 +6,7 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:counter/app.dart';
+import 'package:counter/configs/box_names.dart';
 import 'package:counter/model/counter_model.dart';
 import 'package:counter/model/user_settings_model.dart';
 import 'package:counter/repository/counter_repository.dart';
@@ -21,8 +22,8 @@ void main() {
     Hive.registerAdapter(CounterModelAdapter());
 
     // Open the box for counters
-    final counterBox = await Hive.openBox<CounterModel>('counters');
-    final userSettingsBox = await Hive.openBox<UserSettings>('userSettingsBox');
+    final counterBox = await Hive.openBox<CounterModel>(COUNTER_BOX);
+    final userSettingsBox = await Hive.openBox<UserSettingsModel>(USER_BOX);
     final counterRepository = CounterRepository(counterBox);
     final settingsRepository = SettingsRepository(userSettingsBox);
     await tester.pumpWidget(MyApp(counterRepository, settingsRepository));

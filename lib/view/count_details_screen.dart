@@ -1,3 +1,4 @@
+import 'package:counter/configs/box_names.dart';
 import 'package:counter/model/counter_model.dart';
 import 'package:counter/model/user_settings_model.dart';
 import 'package:counter/routes/route_names.dart';
@@ -14,12 +15,15 @@ class CounterDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userSettingsBox = Hive.box<UserSettings>('userSettingsBox');
-    final settings = userSettingsBox.get('globalSettings');
-
+    final userSettingsBox = Hive.box<UserSettingsModel>(USER_BOX);
+    final counterBox = Hive.box<CounterModel>(COUNTER_BOX);
+    final settings = userSettingsBox.get(USER_DETAILS);
+    final counter = counterBox.get(
+      counterId,
+    );
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Counter Detail"),
+        title: Text(counter!.name.toString()),
         actions: [
           IconButton(
             onPressed: () => Navigator.pushNamed(context, RoutesName.settings),
@@ -100,7 +104,7 @@ class TapWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ValueListenableBuilder(
-            valueListenable: Hive.box<CounterModel>('counters')
+            valueListenable: Hive.box<CounterModel>(COUNTER_BOX)
                 .listenable(keys: [counterId]),
             builder: (context, Box<CounterModel> box, _) {
               final counter = box.get(counterId,

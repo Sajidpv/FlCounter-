@@ -3,7 +3,6 @@ import 'package:counter/repository/settings_repository.dart';
 import 'package:counter/routes/route_names.dart';
 import 'package:counter/routes/routes.dart';
 import 'package:counter/view-model/bloc/counter_bloc.dart';
-import 'package:counter/view/counter_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:counter/utils/quick_actions_handler.dart';
